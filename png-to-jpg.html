@@ -1,0 +1,133 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PNG to JPG Converter - Najmi Tools</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f7fb;
+padding:20px;
+text-align:center;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
+
+img{
+max-width:100%;
+max-height:400px;
+margin-top:20px;
+border:1px solid #ddd;
+border-radius:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>PNG to JPG Converter</h1>
+
+<input type="file" id="fileInput" accept=".png,image/png">
+
+<br><br>
+
+<button onclick="convertToJPG()">
+Convert PNG to JPG
+</button>
+
+<br><br>
+
+<a id="downloadLink" style="display:none;">
+<button>Download JPG</button>
+</a>
+
+<img id="preview">
+
+<p id="status"></p>
+
+</div>
+
+<script>
+
+let uploadedImage;
+
+document.getElementById("fileInput")
+.addEventListener("change",function(e){
+
+const file=e.target.files[0];
+
+if(!file) return;
+
+const reader=new FileReader();
+
+reader.onload=function(event){
+
+preview.src=event.target.result;
+
+uploadedImage=new Image();
+uploadedImage.src=event.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+function convertToJPG(){
+
+if(!uploadedImage){
+alert("Please upload a PNG image");
+return;
+}
+
+const canvas=document.createElement("canvas");
+
+canvas.width=uploadedImage.width;
+canvas.height=uploadedImage.height;
+
+const ctx=canvas.getContext("2d");
+
+ctx.fillStyle="white";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.drawImage(uploadedImage,0,0);
+
+const jpgData=
+canvas.toDataURL("image/jpeg",0.95);
+
+preview.src=jpgData;
+
+downloadLink.href=jpgData;
+downloadLink.download="converted.jpg";
+downloadLink.style.display="inline-block";
+
+status.innerHTML="PNG converted to JPG successfully";
+
+}
+
+</script>
+
+</body>
+</html>
+```
