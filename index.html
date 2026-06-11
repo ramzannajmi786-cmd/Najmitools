@@ -5,15 +5,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Najmi Tools - Free Online Image Tools</title>
-<meta name="description" content="Free online image compressor, image resizer 600x800, and photo tools.">
+<meta name="description" content="Free online image compressor, image resizer 600x800, and white background tool.">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:#f4f7fb;color:#222}
-header{background:#111827;color:#fff;padding:20px}
-nav{text-align:center;margin-top:10px}
+header{background:#111827;color:#fff;padding:20px;text-align:center}
+nav{margin-top:10px}
 nav a{color:#fff;text-decoration:none;margin:0 12px}
-.hero{padding:60px 20px;text-align:center;background:#eaf2ff}
+.hero{padding:50px 20px;text-align:center;background:#eaf2ff}
 .container{max-width:1100px;margin:auto;padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
 .card{
@@ -29,7 +29,10 @@ border:none;
 padding:12px 18px;
 border-radius:8px;
 cursor:pointer;
-margin-top:10px
+margin:5px;
+}
+button:hover{
+background:#1d4ed8;
 }
 .preview{
 width:100%;
@@ -46,13 +49,17 @@ padding:25px;
 text-align:center;
 margin-top:30px
 }
+.download-btn{
+display:none;
+text-decoration:none;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1 style="text-align:center">Najmi Tools</h1>
+<h1>Najmi Tools</h1>
 
 <nav>
 <a href="#">Home</a>
@@ -74,17 +81,17 @@ margin-top:30px
 
 <div class="card">
 <h3>20KB Image Compressor</h3>
-<p>Reduce image size quickly and easily.</p>
+<p>Compress images to smaller size.</p>
 </div>
 
 <div class="card">
 <h3>600×800 Image Resizer</h3>
-<p>Resize photos for forms and applications.</p>
+<p>Resize photos instantly.</p>
 </div>
 
 <div class="card">
 <h3>White Background Tool</h3>
-<p>Create document-ready images.</p>
+<p>Create white background images.</p>
 </div>
 
 </div>
@@ -92,6 +99,7 @@ margin-top:30px
 <br>
 
 <div class="card">
+
 <h2>Upload Image</h2>
 
 <input type="file" id="fileInput" accept="image/*">
@@ -99,31 +107,43 @@ margin-top:30px
 <br><br>
 
 <button onclick="resizeImage()">Resize 600×800</button>
-<button onclick="compressImage()">Compress Image</button>
 
-<a id="downloadLink" style="display:none;">
-<button>Download</button>
+<button onclick="compressImage()">
+20KB Compress
+</button>
+
+<button onclick="whiteBackground()">
+White Background
+</button>
+
+<br>
+
+<a id="downloadLink" class="download-btn">
+<button>Download Image</button>
 </a>
 
 <img id="preview" class="preview">
 
 <p id="status"></p>
+
 </div>
 
 <br>
 
 <div class="card">
 <h2>About Najmi Tools</h2>
+
 <p>
-Najmi Tools provides free online image utilities including
-image compression, image resizing, and photo optimization.
-All processing is done directly in your browser.
+Najmi Tools provides free image compression,
+image resizing and photo optimization tools.
 </p>
+
 </div>
 
 <br>
 
 <div class="card">
+
 <h2>FAQ</h2>
 
 <p><b>Is it free?</b><br>Yes, completely free.</p>
@@ -138,18 +158,22 @@ All processing is done directly in your browser.
 
 <footer>
 <p>© 2026 Najmi Tools</p>
-<p>
-About Us | Privacy Policy | Contact Us | Disclaimer
-</p>
+<p>About Us | Privacy Policy | Contact Us | Disclaimer</p>
 </footer>
 
 <script>
+
 let uploadedImage;
 
+const preview=document.getElementById("preview");
+const downloadLink=document.getElementById("downloadLink");
+const status=document.getElementById("status");
+
 document.getElementById("fileInput")
-.addEventListener("change", function(e){
+.addEventListener("change",function(e){
 
 const file=e.target.files[0];
+
 if(!file) return;
 
 const reader=new FileReader();
@@ -159,6 +183,9 @@ reader.onload=function(event){
 preview.src=event.target.result;
 
 uploadedImage=new Image();
+
+uploadedImage.onload=function(){};
+
 uploadedImage.src=event.target.result;
 
 };
@@ -169,7 +196,13 @@ reader.readAsDataURL(file);
 
 function resizeImage(){
 
+if(!uploadedImage){
+alert("Please upload image first");
+return;
+}
+
 const canvas=document.createElement("canvas");
+
 canvas.width=600;
 canvas.height=800;
 
@@ -180,10 +213,19 @@ ctx.fillRect(0,0,600,800);
 
 ctx.drawImage(uploadedImage,0,0,600,800);
 
-save(canvas.toDataURL("image/jpeg",0.9));
+save(canvas.toDataURL("image/jpeg",0.9),
+"600x800-image.jpg");
+
+status.innerHTML="Image resized to 600×800";
+
 }
 
 function compressImage(){
+
+if(!uploadedImage){
+alert("Please upload image first");
+return;
+}
 
 const canvas=document.createElement("canvas");
 
@@ -191,22 +233,94 @@ canvas.width=uploadedImage.width;
 canvas.height=uploadedImage.height;
 
 const ctx=canvas.getContext("2d");
+
 ctx.drawImage(uploadedImage,0,0);
 
-save(canvas.toDataURL("image/jpeg",0.55));
+let quality=0.9;
+let dataUrl;
+let sizeKB=9999;
+
+while(quality>0.05){
+
+dataUrl=canvas.toDataURL(
+"image/jpeg",
+quality
+);
+
+sizeKB=(dataUrl.length*3/4)/1024;
+
+if(sizeKB<=20){
+break;
 }
 
-function save(data){
+quality-=0.05;
 
-preview.src=data;
+}
 
-downloadLink.href=data;
-downloadLink.download="najmi-tools.jpg";
+save(dataUrl,"20kb-image.jpg");
+
+status.innerHTML=
+"Compressed Size: "+
+sizeKB.toFixed(1)+" KB";
+
+}
+
+function whiteBackground(){
+
+if(!uploadedImage){
+alert("Please upload image first");
+return;
+}
+
+const canvas=document.createElement("canvas");
+
+canvas.width=uploadedImage.width;
+canvas.height=uploadedImage.height;
+
+const ctx=canvas.getContext("2d");
+
+ctx.fillStyle="#ffffff";
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+ctx.drawImage(
+uploadedImage,
+0,
+0
+);
+
+const dataUrl=
+canvas.toDataURL(
+"image/jpeg",
+0.95
+);
+
+save(
+dataUrl,
+"white-background.jpg"
+);
+
+status.innerHTML=
+"White Background Applied";
+
+}
+
+function save(dataUrl,fileName){
+
+preview.src=dataUrl;
+
+downloadLink.href=dataUrl;
+
+downloadLink.download=fileName;
+
 downloadLink.style.display="inline-block";
 
-status.innerHTML="Image Ready For Download";
-
 }
+
 </script>
 
 </body>
